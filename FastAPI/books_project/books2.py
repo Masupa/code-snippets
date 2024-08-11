@@ -43,6 +43,22 @@ async def read_all_books():
     all books"""
     return BOOKS
 
+@app.get("/books/{book_id}")
+async def read_book(book_id: int):
+    """Read book given the book id"""
+    for book in BOOKS:
+        if book.id == book_id:
+            return book
+        
+@app.get("/books/")
+async def read_books_by_rating(book_rating: int):
+    """Read books with the passed rating"""
+    books_to_return = []
+    for book in BOOKS:
+        if book.rating == book_rating:
+            books_to_return.append(book)
+    return books_to_return
+
 @app.post("/create-book")
 async def create_book(body_request: BodyRequest):
     """ Adds a new book to the catalogue of books """
@@ -58,3 +74,19 @@ def find_book_id(book: Book):
         book.id = 1
 
     return book
+
+@app.put("/books/update_book")
+async def update_book(book_request: BodyRequest):
+    """Update an existing book given the book
+    title"""
+    for index, book in enumerate(BOOKS):
+        if book.title.casefold() == book_request.title.casefold():
+            BOOKS[index] = Book(**book_request.model_dump())
+
+@app.delete("/books/{book_id}")
+async def delete_book(book_id: int):
+    """Delete book from catalogue given it's book ID"""
+    for index, book in enumerate(BOOKS):
+        if book.id == book_id:
+            BOOKS.pop(index)
+            break
