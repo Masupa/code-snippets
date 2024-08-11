@@ -56,3 +56,12 @@ async def read_author_category_by_query(book_author: str, category: str):
 async def create_book(new_book=Body()):
     """Add a new book"""
     BOOKS.append(new_book)
+
+
+# Similar to Post methods, Put methods have a body
+@app.put("/books/update_book")
+async def update_book(updated_book=Body()):
+    """ Updates an existing book with the new information """
+    for index, book in enumerate(BOOKS, start=0):
+        if book['title'].casefold() == updated_book['title'].casefold():
+            BOOKS[index] = updated_book
