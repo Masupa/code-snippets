@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Body
+from typing import Optional
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
 
 app = FastAPI()
 
@@ -17,6 +19,14 @@ class Book:
         self.description = description
         self.rating = rating
 
+class BodyRequest(BaseModel):
+    """Validate book attributes"""
+    id: Optional[int] = Field(description='ID is not needed on create', default=None)
+    title: str = Field(min_length=3)
+    author: str = Field(min_length=1)
+    description: str = Field(min_length=3, max_length=100)
+    rating: int = Field(gt=0, lt=6)
+
 # List of book objects
 BOOKS = [
     Book(1, 'Computer Science Pro', 'codingwithroby', 'A very nice book', 5),
@@ -34,6 +44,17 @@ async def read_all_books():
     return BOOKS
 
 @app.post("/create-book")
-async def create_book(body_request=Body()):
+async def create_book(body_request: BodyRequest):
     """ Adds a new book to the catalogue of books """
-    BOOKS.append(body_request)
+    new_book = Book(**body_request.model_dump())
+    BOOKS.append(find_book_id(new_book))
+
+def find_book_id(book: Book):
+    """Finds the book ID of the recently added book,
+    and assigns the new book and appropriate ID"""
+    if len(BOOKS) > 0:
+        book.id = BOOKS[-1].id + 1
+    else:
+        book.id = 1
+
+    return book
