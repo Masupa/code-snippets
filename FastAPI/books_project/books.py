@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import Body, FastAPI
 
 app = FastAPI()  # Makes the file a FastAPI app
 
@@ -49,3 +49,10 @@ async def read_author_category_by_query(book_author: str, category: str):
                 book['category'].casefold() == category.casefold():
             books_to_return.append(book)
     return books_to_return
+
+
+# Post methods have a body; get methods can't have a body
+@app.post("/books/create_book")
+async def create_book(new_book=Body()):
+    """Add a new book"""
+    BOOKS.append(new_book)
