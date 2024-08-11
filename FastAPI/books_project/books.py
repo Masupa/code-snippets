@@ -65,3 +65,12 @@ async def update_book(updated_book=Body()):
     for index, book in enumerate(BOOKS, start=0):
         if book['title'].casefold() == updated_book['title'].casefold():
             BOOKS[index] = updated_book
+
+
+@app.delete("/books/delete_book/{book_title}")
+async def delete_book(book_title: str):
+    """ Deletes a book given a book title """
+    for index, book in enumerate(BOOKS, start=0):
+        if book['title'].casefold() == book_title.casefold():
+            BOOKS.pop(index)
+            break
