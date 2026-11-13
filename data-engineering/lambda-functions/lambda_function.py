@@ -2,34 +2,28 @@ import json
 import requests
 import tempfile
 
-from upload import upload
-
-
-url = "https://football-data.co.uk/mmz4281/2627/E0.csv"
+from extract_load import extract_load, create_aws_client
 
 
 def lambda_handler(event, context):
     status_code = None
     body_text = str
 
-    # Fetch the CSV data from the URL
-    response = requests.get(url)
+    try:
+        # Create an AWS s3 client
+        s3_client = create_aws_client()
 
-    if response.status_code == 200:
-        status_code = response.status_code
+        # Call the extract_load function
+        response = extract_load(
+            s3_client=s3_client
+        )
 
-        # Save the CSV data to a temporary file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as temp_file:
-            temp_file.write(response.content)
-            temp_file_path = temp_file.name
+        status_code = response['status_code']
+        body_text = response['message']
 
-        # upload the CSV data to S3
-        upload(temp_file_path)
-        body_text = "Data uploaded successfully."
-
-    else:
-        status_code = response.status_code
-        body_text = "Failed to fetch data."
+    except Exception as e:
+        status_code = 500
+        body_text = str(e)
 
     return {
         'statusCode': status_code,
