@@ -25,8 +25,9 @@ def lambda_handler(event, context):
         status_code = 500
         body_text = str(e)
 
-    return {
-        'statusCode': status_code,
-        'body': json.dumps(body_text)
-    }
-        
+    finally:
+        return {
+            'statusCode': status_code,
+            'body': json.dumps(body_text)
+        }
+       
