@@ -16,7 +16,10 @@ EPL_URL = f"https://football-data.co.uk/mmz4281/{SEASON}/E0.csv"
 def create_aws_client():
     """Create and return an AWS S3 client using the configured profile."""
     # Create an AWS Session
-    aws_session = boto3.Session(profile_name=os.getenv("AWS_PROFILE"))
+    if os.environ.get("ENVIRON") == "dev":
+        aws_session = boto3.Session(profile_name=os.getenv("AWS_PROFILE"))
+    else:
+        aws_session = boto3.Session()
     return aws_session.client("s3")
 
 
